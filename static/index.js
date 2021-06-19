@@ -1,8 +1,8 @@
 var section_ids = ["#result", "#question-section", "#start_quiz", "#spinner"];
 var QUESTION_LIST = [];
 var user_id, tag;
-var start
-var end
+var start;
+var end;
 
 const spinner = document.querySelector("#spinner");
 const answer_input = document.querySelector("#answer_input");
@@ -10,8 +10,8 @@ const question_section = document.querySelector("#question-section");
 
 const answer_button = document.querySelector("#answer-btn");
 answer_button.addEventListener("click", function (event) {
-  end = new Date()
-  nextQuestion()
+  end = new Date();
+  nextQuestion();
 });
 
 document
@@ -39,6 +39,7 @@ tag_input.addEventListener("change", function (event) {
     start_btn.disabled = true;
   }
 });
+
 const indicator = document.querySelector("#indicator");
 const start_btn = document.querySelector("#start_btn");
 start_btn.addEventListener("click", function (event) {
@@ -64,6 +65,20 @@ start_btn.addEventListener("click", function (event) {
       }`;
       set_question(0);
       indicator.innerText = "⚪".repeat(QUESTION_LIST.length);
+      document.addEventListener("keydown", function (event) {
+        console.log(event);
+        if (
+          event.key == "1" ||
+          event.key == "2" ||
+          event.key == "3" ||
+          event.key == "4"
+        ) {
+          answer_input.options.value = parseInt(event.key) - 1;
+          document.querySelector(`#choice${parseInt(event.key) - 1}`).click();
+        } else if (event.key == "Enter" || event.key == " ") {
+          answer_button.click();
+        }
+      });
     })
     .catch((error) => console.error("Error:", error));
 });
@@ -90,47 +105,28 @@ function unset_loading(ids) {
   document.querySelector(ids).style.display = "inline-block";
 }
 
-// function shirink_time(time){
-//   function frame() {
-//     if (width < 0) {
-//       clearInterval(id);
-//       nextQuestion();
-//     } else {
-//       width -= 1/time;
-//       timebar.style.width = width + "%";
-//       timer.innerText= `${Math.ceil((width/100)*time)}초`
-//     }
-//   }
-
-//   var timebar = document.getElementById("time-bar");
-//   var timer = document.getElementById("timer");
-//   var width = 100
-//   var id = setInterval(frame, 10);
-//   return id
-// }
-
 function is_answer_right(answer, ground_truth) {
   return (
     normalize(answer) != "" &&
     (normalize(answer).includes(normalize(ground_truth)) ||
       normalize(ground_truth).includes(normalize(answer)))
   );
-};
+}
 
 function normalize(original) {
   return original.replace(/[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣1-9]/g, "");
-};
+}
 
 function nextQuestion() {
   if (isClicked) return;
   isClicked = true;
   // event.target.dataset.clicked = true;
-  var answer = answer_input.value;
+  var answer = parseInt(answer_input.options.value);
   var index = parseInt(document.querySelector("#q-number").innerText);
   var real_index = index - 1;
   answers.push(answer);
-  answer_input.value = "";
-  if (is_answer_right(answer, QUESTION_LIST[real_index]["answer"])) {
+  answer_input.options.value = "";
+  if (answer == QUESTION_LIST[real_index]["answer"]) {
     QUESTION_LIST[real_index]["user_answer"] = 1;
     indicator.innerText = indicator.innerText.replace("⚪", "🟢");
   } else {
@@ -140,7 +136,6 @@ function nextQuestion() {
   QUESTION_LIST[real_index]["user_id"] = user_id;
   QUESTION_LIST[real_index]["tag"] = tag;
   QUESTION_LIST[real_index]["elapsed"] = end - start;
-  answer_input.value = '';
 
   if (index == QUESTION_LIST.length) {
     setTimeout(function () {
@@ -161,26 +156,41 @@ function nextQuestion() {
 
 function set_question(index) {
   let question = QUESTION_LIST[index].text;
+  console.log(QUESTION_LIST["choices"]);
   document.querySelector("#q-number").innerText = index + 1;
   question_section.style.opacity = 1;
-
+  for (var i of [0, 1, 2, 3]) {
+    console.log(QUESTION_LIST[index][`choice${i}`]);
+    document.querySelector(`#choice${i}`).innerText =
+      QUESTION_LIST[index][`choice${i}`];
+  }
   document.querySelector("#question-text").innerText = question;
+
   unset_loading("#question-section");
   answer_input.autofocus = true;
   isClicked = false;
-  start = new Date()
-  // document.getElementById("time-bar").style.width = 100 + "%";  
-  // var time = 40 - QUESTION_LIST[index].grade*10;
-  // return shirink_time(time)
+  start = new Date();
 }
+function embed_card(card_name, data) {
+  console.log(data);
+  card = document.querySelector(card_name);
+  const card_title = card.querySelector(".card-title");
+  const user_name = card.querySelector("#user_name");
+  const hidden_answer = card.querySelector(".hidden_answer");
+  const hidden_answer_btn = card.querySelector(".hidden_answer_btn");
+  card_title.innerText = data["text"];
+  user_name.innerText = user_id;
+  hidden_answer.innerText = data["answer"];
 
+  hidden_answer_btn.addEventListener("click", function (event) {
+    hidden_answer.hidden = false;
+    hidden_answer_btn.hidden = true;
+  });
+  for (var i of [0, 1, 2, 3]) {
+    card.querySelector(`.card_choice${i}`).innerText = data[`choice${i}`];
+  }
+}
 function get_score() {
-  // for (var i = 0; i < QUESTION_LIST.length; i++) {
-  //   QUESTION_LIST[i]["answer"] = answers[i];
-  //   QUESTION_LIST[i]['userID'] = userID[i];
-  //   QUESTION_LIST[i]['elapsed'] = elapsed[i];
-  // }
-
   fetch("/get_score", {
     method: "POST", // or 'PUT'
     body: JSON.stringify(QUESTION_LIST), // data can be `string` or {object}!
@@ -190,12 +200,18 @@ function get_score() {
   })
     .then((res) => res.json())
     .then((response) => {
-      var score = parseInt(JSON.stringify(response));
+      var data = response;
       unset_loading("#result");
       question_section.style.display = "none";
-      if (score != 0) {
-        animateValue("value", 0, JSON.stringify(response), 3000);
+      console.log(tag_input);
+      document.querySelector("#all_len").innerText = `${
+        tag_input.options[parseInt(tag) + 1].innerText
+      } 분야 ${data["tag_problem_len"]} 문제 중에 `;
+      if (data["score"] != 0) {
+        animateValue("value", 0, data["score"], 3000);
       }
+      embed_card("#hard_card", data["h_problem"]);
+      embed_card("#easy_card", data["e_problem"]);
     })
     .catch((error) => console.error("Error:", error));
 }

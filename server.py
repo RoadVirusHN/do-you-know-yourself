@@ -14,7 +14,6 @@ def index():
 
 @app.route("/get_questions", methods=["POST"])
 def get_questions():
-    print(request.json)
     tag = request.json["tag"]
     user = request.json["user"]
     questions = pd.read_csv("question.csv")
@@ -28,12 +27,11 @@ def get_score():
     user_data = []
     for d in data:
         if "answer" in d:
-            row = [d["tag"], d["assess"], d["grade"], d["text"], d["answer"]]
+            row = [d["tag"], d["assess"], d["grade"], d["text"], d["answer"], d["elapsed"], d["user_id"]]
             user_data.append(row)
 
-    score = inference.inference(user_data)
-    score = int(score)
-    return str(score)
+    data = inference.inference(user_data)
+    return data
 
 
 if __name__ == "__main__":

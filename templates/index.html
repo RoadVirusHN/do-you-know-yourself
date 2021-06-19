@@ -1,12 +1,12 @@
 {% extends "base.html" %} {% block body %}
-<div id="indicator" style="text-align: center; margin-top: 2%;">
+<div id="indicator" style="text-align: center; margin-top: 10px;">
     🟢🔴⚪
 </div>
 <div
   class="row align-items-center justify-content-center"
   style="
     background: url('../static/blackboard.png') center no-repeat;
-    background-size: 100%;
+    background-size: 80%;
     position: absolute;
     width: 75%;
     height: 90%;
@@ -20,8 +20,8 @@
     <span class="sr-only"></span>
   </div>
   <div id="start_quiz" class="col justify-content-center mb-5">
-    <h1 class="mb-5">DKDKT 상식 테스트</h1>
-    <p class="mx-5" style="font-size: 1.5rem">
+    <h1 class="mb-3" style="font-size: 3vw;">DKDKT 상식 테스트</h1>
+    <p class="mx-5" style="font-size: 1.5vw;">
       상식 테스트를 진행합니다.<br />
       정답과 오답 비율에 따라 예측 점수가 달라지는 걸 확인해보세요.
     </p>
@@ -54,52 +54,120 @@
 
   <div
     id="question-section"
-    style="padding: 15%; height: 100%; display: none"
+    style="padding: 4vw; height: 40vw; display: none"
     data-started="false"
   >
-    <h3 class="mt-5">문제 <span id="q-number">1</span></h2>
+    <h3 class="mt-4">문제 <span id="q-number">1</span></h2>
     <div class="game-box">
-      <p id="question-text" class="mt-4" style="font-size: 2rem;">Loading...</h1>
-      <form action="">
-        <div style="margin-top: 20px; position: absolute; bottom: 25%; left: 50%; transform: translateX(-50%);">
-          <input
+      <p id="question-text" class="mt-3" style="font-size: 2vw;">Loading...</h1>
+      <form id="answer_input" style="margin-top: 2vw;">
+        <div class="d-flex flex-column justify-content-around align-items-center">
+          <!-- <input
             id="answer_input"
             class="form-control-lg my-2"
             type="text"
             placeholder="답안"            
             aria-label="example"
-          />
-          <br />
-          <!-- <p id="timer" class="my-4" style="width: 100%"></p>
-          <div id="progress-bar" class="mt-3">
-            <div id="time-bar"></div>
-          </div> -->
+          /> -->
+          <div class="d-flex flex-row justify-content-around align-items-center mb-4" style="width: 70%; height: 5vw;">
+            <div style="width: 40%;">
+              <input type="radio" class="btn-check" name="options" value="0" id="option1" autocomplete="off">
+              <label class="btn btn-secondary" style="width: 10vw; height: 6vw; background-color: crimson;" for="option1"><p class="m-0" style="font-size: 1.5vw;">1</p><p id="choice0" style="overflow-wrap: break-word;">...</p></label>
+            </div>
+              
+            <div style="width: 40%;">
+              <input type="radio" class="btn-check" name="options" value="1" id="option2" autocomplete="off">
+              <label class="btn btn-secondary" style="width: 10vw; height: 6vw; background-color:rgb(170, 138, 95);" for="option2"><p class="m-0" style="font-size: 1.5vw;"> 2</p><p id="choice1"  style="overflow-wrap: break-word;">...</p></label>
+            </div>
+          </div>
+          <div class="d-flex flex-row justify-content-around align-items-center mt-4" style="width: 70%;">
+            <div style="width: 40%;">
+              <input type="radio" class="btn-check" name="options" value="2" id="option3" autocomplete="off">
+              <label class="btn btn-secondary" style="width: 10vw; height: 6vw; background-color: seagreen;" for="option3"><p class="m-0" style="font-size: 1.5vw;">3</p><p id="choice2" style="overflow-wrap: break-word;">...</p></label>
+            </div>
+              
+            <div style="width: 40%;">
+              <input type="radio" class="btn-check" name="options" value="3" id="option4" autocomplete="off">
+              <label class="btn btn-secondary" style="width: 10vw; height: 6vw; background-color: royalblue;" for="option4"><p class="m-0" style="font-size: 1.5vw;">4</p><p id="choice3"  style="overflow-wrap: break-word;">...</p></label>
+            </div>
+            </div>
+        </div>
           <button
             type="button"
             id="answer-btn"
             data-answer="1"
-            class="btn btn-primary btn-sm my-4 answer-btn"
-            style="height: 2em; width: 75%; font-size: 1.5rem;"
+            class="btn btn-primary btn-sm answer-btn shadow rounded"
+            style="height: 3vw; width: 25%; margin-top: 4.5vw; font-size: 1.5rem; position: absolute; left: 50%; transform: translate(-50%, -70%);"
           >
             제출
           </button>
-        </div>
       </form>
     </div>
-  </div>
-
-  <div id="result" style="padding: 20%; height: 100%; display: none">
-    <h3>Your predicted score is:</h3>
-    <div><span id="value">0</span>점!</div>
+  </div> 
+  </div> 
+</div>
+<div id="result" style="height: 100vh; width: 100%; display: none; position: absolute; top: 0; background-color: rgba(0, 0, 0, 0.63);">
+  <p style="font-size: 2.5vw;">Your predicted score is:</p>
+  <div style="font-size: 3vw;"><span style="font-size: 3vw;" id="all_len"></span><span style="font-size: 4vw;" id="value">0</span>문제 맞출걸로 예상</div>
+  <div class="d-flex flex-row justify-content-around my-5">
+    <div id="easy_card" class="card " style="width: 35vw;">
+      <div class="card-body bg-info bg-gradient">
+        <h5 class="card-title fw-bold">...</h5>
+        <h6 class="card-subtitle mb-2 fw-bold "><span id="user_name"></span>님이 맞을 확률이 높은 문제</h6>
+        <div class="card-text d-flex flex-column justify-content-center">
+          <div class="d-flex mx-auto" style="width: 20vw; height: 10vw;">
+            <div style="display:inline-block; background-color: crimson; width: 10vw; height: 10vw;"><p class="mt-2" style="font-size: 1.5vw;">1️⃣</p><p class="card_choice0" style="font-size: 1vw;"></p></div>
+            <div style="display:inline-block; background-color: rgb(170, 138, 95); width: 10vw; height: 10vw;"><p class="mt-2" style="font-size: 1.5vw;">2️⃣</p><p class="card_choice1" style="font-size: 1vw;"></p></div>
+          </div>
+          <div class="d-flex mx-auto" style="width: 20vw; height: 10vw;">
+            <div style="display:inline-block; background-color: seagreen; width: 10vw; height: 10vw;"><p class="mt-2" style="font-size: 1.5vw;">3️⃣</p><p class="card_choice2" style="font-size: 1vw;"></p></div>
+            <div style="display:inline-block; background-color: royalblue; width: 10vw; height: 10vw;"><p class="mt-2" style="font-size: 1.5vw;">4️⃣</p><p class="card_choice3" style="font-size: 1vw;"></p></div>
+          </div>
+        </div>
+        <button
+        type="button"
+        class="hidden_answer_btn btn btn-primary btn-sm answer-btn shadow rounded my-3"
+        style="height: 10%; width: 20%; font-size: 1vw;"
+        >
+          정답은?
+        </button>
+        <span class="hidden_answer badge rounded-pill bg-success m-3" style="height: 10%; width: 20%; font-size: 2vw;" hidden>...</span>
+      </div>
+    </div>
+    
+    <div id="hard_card" class="card" style="width: 35vw;">
+      <div class="card-body bg-warning bg-gradient">
+        <h5 class="card-title fw-bold">...</h5>
+        <h6 class="card-subtitle mb-2 fw-bold"><span id="user_name"></span>님이 틀릴 확률이 높은 문제</h6>
+        <div class="card-text d-flex flex-column justify-content-center">
+          <div class="d-flex mx-auto" style="width: 20vw; height: 10vw;">
+            <div style="display:inline-block; background-color: crimson; width: 10vw; height: 10vw;"><p class="mt-2" style="font-size: 1.5vw;">1️⃣</p><p class="card_choice0" style="font-size: 1vw;"></p></div>
+            <div style="display:inline-block; background-color: rgb(170, 138, 95); width: 10vw; height: 10vw;"><p class="mt-2" style="font-size: 1.5vw;">2️⃣</p><p class="card_choice1" style="font-size: 1vw;"></p></div>
+          </div>
+          <div class="d-flex mx-auto" style="width: 20vw; height: 10vw;">
+            <div style="display:inline-block; background-color: seagreen; width: 10vw; height: 10vw;"><p class="mt-2" style="font-size: 1.5vw;">3️⃣</p><p class="card_choice2" style="font-size: 1vw;"></p></div>
+            <div style="display:inline-block; background-color: royalblue; width: 10vw; height: 10vw;"><p class="mt-2" style="font-size: 1.5vw;">4️⃣</p><p class="card_choice3" style="font-size: 1vw;"></p></div>
+          </div>
+        </div>
+        <button
+        type="button"
+        class="hidden_answer_btn btn btn-primary btn-sm answer-btn shadow rounded my-3"
+        style="height: 10%; width: 20%; font-size: 1vw;"
+        >
+        정답은?
+      </button>
+        <span class="hidden_answer badge rounded-pill bg-success m-3" style="height: 10%; width: 20%; font-size: 2vw;" hidden>...</span>
+      </div>
+    </div>
+  </div>   
     <button
       type="button"
       id="restart-btn"
       class="btn btn-primary btn-sm my-4 answer-btn"
-      style="height: 3em; width: 20%"
+      style="height: 8%; width: 15%; font-size: 1vw;"
     >
       재도전
     </button>
-  </div>
-</div>
+    </div>
 
 {% endblock %}
