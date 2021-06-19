@@ -6,12 +6,13 @@ var section_ids = [
 ]
 var QUESTION_LIST = [];
 fetch("/get_questions")
-.then((res) => res.json())
+  .then((res) => res.json())
   .then((response) => {
-    // console.log(typeof(response))
-    for (const k in response){
+
+    for (const k in response) {
       QUESTION_LIST.push(response[k]);
     }
+
     // QUESTION_LIST = response.map(x=>response[x]);
     // console.log(QUESTION_LIST)
     unset_loading("#start_quiz");
@@ -29,14 +30,14 @@ function getRandomIntInclusive(min, max) {
 }
 
 function set_loading() {
-  for (let section of section_ids){
+  for (let section of section_ids) {
     document.querySelector(section).style.display = "none";
   }
   document.querySelector("#spinner").style.display = "inline-block";
   console.log(document.querySelector("#spinner").style.display)
 }
 
-function unset_loading(ids){  
+function unset_loading(ids) {
   document.querySelector("#spinner").style.display = "none";
   document.querySelector(ids).style.display = "inline-block";
 }
@@ -60,7 +61,7 @@ function unset_loading(ids){
 //   return id
 // }
 
-function nextQuestion(){
+function nextQuestion() {
   if (isClicked) return;
   isClicked = true;
   // event.target.dataset.clicked = true;
@@ -68,13 +69,13 @@ function nextQuestion(){
   var index = parseInt(document.querySelector("#q-number").innerText);
   answers.push(answer);
   document.querySelector("#answer_input").value = '';
-  
+
   if (index == QUESTION_LIST.length) {
     setTimeout(function () {
       get_score();
     }, 1000);
-  } else {      
-    document.querySelector('#q_num').innerText = `${index+1}/${QUESTION_LIST.length}`
+  } else {
+    document.querySelector('#q_num').innerText = `${index + 1}/${QUESTION_LIST.length}`
     setTimeout(function () {
       clearInterval(set_question(index));
     }, 500);
@@ -89,11 +90,11 @@ function set_question(index) {
   let question = QUESTION_LIST[index].text;
   document.querySelector("#q-number").innerText = index + 1;
   document.querySelector("#question-section").style.opacity = 1;
-  
+
   document.querySelector("#question-text").innerText = question;
   unset_loading("#question-section");
   isClicked = false;
-  
+
   // document.getElementById("time-bar").style.width = 100 + "%";  
   // var time = 40 - QUESTION_LIST[index].grade*10;
   // return shirink_time(time)
@@ -123,12 +124,12 @@ function get_score() {
     .catch((error) => console.error("Error:", error));
 }
 
-document.querySelector('#start_btn').addEventListener("click", function(event){
+document.querySelector('#start_btn').addEventListener("click", function (event) {
   document.querySelector("#question-section").dataset.started = true;
   document.querySelector("#start_quiz").style.display = "none";
   document.querySelector('#q_num').innerText = `${1}/${QUESTION_LIST.length}`
   set_loading();
-  set_question(0);  
+  set_question(0);
 })
 
 document.querySelector('#answer-btn').addEventListener("click", function (event) {
