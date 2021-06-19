@@ -6,14 +6,16 @@ var section_ids = [
 ]
 var QUESTION_LIST = [];
 var user_id;
-
+var start
+var end
 
 const spinner = document.querySelector("#spinner");
 const answer_input = document.querySelector("#answer_input");
-const question_section= document.querySelector("#question-section");
+const question_section = document.querySelector("#question-section");
 
 const answer_button = document.querySelector('#answer-btn');
 answer_button.addEventListener("click", function (event) {
+  end = new Date()
   nextQuestion()
 });
 
@@ -22,8 +24,8 @@ document.querySelector('#restart-btn').addEventListener("click", function (event
 });
 
 const user_input = document.querySelector('#user_input');
-user_input.addEventListener("input", function(event){
-  if (user_input.value.length > 2){
+user_input.addEventListener("input", function (event) {
+  if (user_input.value.length > 2) {
     start_btn.disabled = false;
   } else {
     start_btn.disabled = true;
@@ -32,32 +34,33 @@ user_input.addEventListener("input", function(event){
 
 
 const start_btn = document.querySelector('#start_btn');
-start_btn.addEventListener("click", function(event){
+start_btn.addEventListener("click", function (event) {
   question_section.dataset.started = true;
   document.querySelector("#start_quiz").style.display = "none";
   set_loading();
   fetch("/get_questions", {
     method: "POST",
-    body:  JSON.stringify({tag:'0', user:user_input.value}), 
+    body: JSON.stringify({ tag: '0', user: user_input.value }),
     headers: {
       "Content-Type": "application/json",
     },
   })
-  .then((res) => res.json())
-  .then((response) => {
-    console.log(response)
-    for (const k in response){
-      QUESTION_LIST.push(response[k]);
-    }
-    document.querySelector('#q_num').innerText = `${1}/${QUESTION_LIST.length}`
-    set_question(0);  
-  })
-  .catch((error) => console.error("Error:", error));  
+    .then((res) => res.json())
+    .then((response) => {
+      console.log(response)
+      for (const k in response) {
+        QUESTION_LIST.push(response[k]);
+      }
+      document.querySelector('#q_num').innerText = `${1}/${QUESTION_LIST.length}`
+      set_question(0);
+    })
+    .catch((error) => console.error("Error:", error));
 });
 
 var isClicked = false;
 var answers = [];
-
+var userID = [];
+var elapsed = [];
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -71,7 +74,7 @@ function set_loading() {
   spinner.style.display = "inline-block"
 }
 
-function unset_loading(ids){  
+function unset_loading(ids) {
   spinner.style.display = "none";
   document.querySelector(ids).style.display = "inline-block";
 }
@@ -102,8 +105,10 @@ function nextQuestion() {
   var answer = answer_input.value;
   var index = parseInt(document.querySelector("#q-number").innerText);
   answers.push(answer);
+  userID.push(user_input.value)
+  elapsed.push(end - start)
   answer_input.value = '';
-  
+
   if (index == QUESTION_LIST.length) {
     setTimeout(function () {
       get_score();
@@ -123,11 +128,11 @@ function set_question(index) {
   let question = QUESTION_LIST[index].text;
   document.querySelector("#q-number").innerText = index + 1;
   question_section.style.opacity = 1;
-  
+
   document.querySelector("#question-text").innerText = question;
   unset_loading("#question-section");
   isClicked = false;
-
+  start = new Date()
   // document.getElementById("time-bar").style.width = 100 + "%";  
   // var time = 40 - QUESTION_LIST[index].grade*10;
   // return shirink_time(time)
@@ -136,6 +141,8 @@ function set_question(index) {
 function get_score() {
   for (var i = 0; i < QUESTION_LIST.length; i++) {
     QUESTION_LIST[i]["answer"] = answers[i];
+    QUESTION_LIST[i]['userID'] = userID[i];
+    QUESTION_LIST[i]['elapsed'] = elapsed[i];
   }
 
   fetch("/get_score", {
