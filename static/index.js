@@ -45,6 +45,7 @@ start_btn.addEventListener("click", function(event){
   })
   .then((res) => res.json())
   .then((response) => {
+    console.log(response)
     for (const k in response){
       QUESTION_LIST.push(response[k]);
     }
@@ -64,7 +65,7 @@ function getRandomIntInclusive(min, max) {
 }
 
 function set_loading() {
-  for (let section of section_ids){
+  for (let section of section_ids) {
     document.querySelector(section).style.display = "none";
   }
   spinner.style.display = "inline-block"
@@ -94,7 +95,7 @@ function unset_loading(ids){
 //   return id
 // }
 
-function nextQuestion(){
+function nextQuestion() {
   if (isClicked) return;
   isClicked = true;
   // event.target.dataset.clicked = true;
@@ -107,8 +108,8 @@ function nextQuestion(){
     setTimeout(function () {
       get_score();
     }, 1000);
-  } else {      
-    document.querySelector('#q_num').innerText = `${index+1}/${QUESTION_LIST.length}`
+  } else {
+    document.querySelector('#q_num').innerText = `${index + 1}/${QUESTION_LIST.length}`
     setTimeout(function () {
       clearInterval(set_question(index));
     }, 500);
@@ -126,7 +127,7 @@ function set_question(index) {
   document.querySelector("#question-text").innerText = question;
   unset_loading("#question-section");
   isClicked = false;
-  
+
   // document.getElementById("time-bar").style.width = 100 + "%";  
   // var time = 40 - QUESTION_LIST[index].grade*10;
   // return shirink_time(time)
