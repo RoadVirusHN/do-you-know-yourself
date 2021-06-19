@@ -11,12 +11,14 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route('/get_questions', methods=['POST'])
-def get_questions():    
+
+@app.route("/get_questions", methods=["POST"])
+def get_questions():
     print(request.json)
-    tag = request.json
-    user = request.json
-    questions = questions = pd.read_csv("question.csv")
+    tag = request.json["tag"]
+    user = request.json["user"]
+    questions = pd.read_csv("question.csv")
+    questions = questions.groupby("tag").get_group(int(tag))
     return Response(questions.to_json(orient="records"), mimetype="application/json")
 
 

@@ -1,6 +1,8 @@
 var section_ids = ["#result", "#question-section", "#start_quiz", "#spinner"];
 var QUESTION_LIST = [];
 var user_id, tag;
+var start
+var end
 
 const spinner = document.querySelector("#spinner");
 const answer_input = document.querySelector("#answer_input");
@@ -8,7 +10,8 @@ const question_section = document.querySelector("#question-section");
 
 const answer_button = document.querySelector("#answer-btn");
 answer_button.addEventListener("click", function (event) {
-  nextQuestion();
+  end = new Date()
+  nextQuestion()
 });
 
 document
@@ -67,7 +70,8 @@ start_btn.addEventListener("click", function (event) {
 
 var isClicked = false;
 var answers = [];
-
+var userID = [];
+var elapsed = [];
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
@@ -135,6 +139,8 @@ function nextQuestion() {
   }
   QUESTION_LIST[real_index]["user_id"] = user_id;
   QUESTION_LIST[real_index]["tag"] = tag;
+  QUESTION_LIST[real_index]["elapsed"] = end - start;
+  answer_input.value = '';
 
   if (index == QUESTION_LIST.length) {
     setTimeout(function () {
@@ -162,16 +168,17 @@ function set_question(index) {
   unset_loading("#question-section");
   answer_input.autofocus = true;
   isClicked = false;
-
-  // document.getElementById("time-bar").style.width = 100 + "%";
+  start = new Date()
+  // document.getElementById("time-bar").style.width = 100 + "%";  
   // var time = 40 - QUESTION_LIST[index].grade*10;
   // return shirink_time(time)
 }
 
 function get_score() {
   // for (var i = 0; i < QUESTION_LIST.length; i++) {
-  //   QUESTION_LIST[i]["user_id"] = user_id;
-  //   QUESTION_LIST[i]["tag"] = tag;
+  //   QUESTION_LIST[i]["answer"] = answers[i];
+  //   QUESTION_LIST[i]['userID'] = userID[i];
+  //   QUESTION_LIST[i]['elapsed'] = elapsed[i];
   // }
 
   fetch("/get_score", {
