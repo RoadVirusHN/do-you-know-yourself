@@ -1,0 +1,62 @@
+body {
+  background-color: rgba(121, 207, 164, 0.836);
+  color: snow !important;
+}
+div,
+h1,
+h2,
+h3 {
+  text-align: center;
+}
+h1 {
+  font-size: 60px;
+}
+.game-box img {
+  width: 100%;
+}
+button {
+  width: 20%;
+  height: 100px;
+}
+#answer_input {
+  background-color:rgba(0,0,0,0) !important;
+  /* border:none !important; */
+  color: snow;
+}
+p {
+  font-size: 15px;
+}
+#progress-bar{        
+  width: 100%;
+  background-color: grey;
+}
+#time-bar{        
+  width: 100%;
+  height: 15px;
+  background-color: green;
+}
+#value {
+  font-size: 100px;
+}
+#question-section {
+  transition: opacity 0s, opacity 0.5s linear;
+}
+#spinner {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+@media only screen and (max-device-width: 768px) {
+  h2 {
+    font-size: 40px;
+  }
+  p {
+    font-size: 50px;
+  }
+  button {
+    font-size: 45px !important;
+  }
+}

@@ -1,81 +1,80 @@
-var QUESTION_LIST = [
-  {
-    q_content: "➕",
-    tag: 7597,
-    test_id: "A010000060",
-    assess_id: "A010060001",
-    grade: 0,
-  },
-  {
-    q_content: "➖",
-    tag: 397,
-    test_id: "A050000094",
-    assess_id: "A050094005",
-    grade: 0,
-  },
-  {
-    q_content: "✖",
-    tag: 451,
-    test_id: "A050000155",
-    assess_id: "A050155004",
-    grade: 1,
-  },
-  {
-    q_content: "➗",
-    tag: 587,
-    test_id: "A060000017",
-    assess_id: "A060017006",
-    grade: 2
-  },
-  {
-    q_content: "➗",
-    tag: 587,
-    test_id: "A060000017",
-    assess_id: "A060017007",
-    grade: 3,
-  }
-];
+var section_ids = [
+  "#result",
+  "#question-section",
+  "#start_quiz",
+  "#spinner"
+]
+var QUESTION_LIST = [];
+fetch("/get_questions")
+.then((res) => res.json())
+  .then((response) => {
+    // console.log(typeof(response))
+    for (const k in response){
+      QUESTION_LIST.push(response[k]);
+    }
+    // QUESTION_LIST = response.map(x=>response[x]);
+    // console.log(QUESTION_LIST)
+    unset_loading("#start_quiz");
+  })
+  .catch((error) => console.error("Error:", error));
+
+set_loading();
+var isClicked = false;
 var answers = [];
+
 function getRandomIntInclusive(min, max) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min; //최댓값도 포함, 최솟값도 포함
 }
 
-function shirink_time(time){
-
-  function frame() {
-    if (width < 0) {
-      clearInterval(id);
-      nextQuestion();
-    } else {
-      width -= 1/time;
-      timebar.style.width = width + "%";
-      timer.innerText= `${Math.ceil((width/100)*time)}초`
-    }
+function set_loading() {
+  for (let section of section_ids){
+    document.querySelector(section).style.display = "none";
   }
-
-  var timebar = document.getElementById("time-bar");
-  var timer = document.getElementById("timer");
-  var width = 100
-  var id = setInterval(frame, 10);
-  return id
+  document.querySelector("#spinner").style.display = "inline-block";
+  console.log(document.querySelector("#spinner").style.display)
 }
+
+function unset_loading(ids){  
+  document.querySelector("#spinner").style.display = "none";
+  document.querySelector(ids).style.display = "inline-block";
+}
+
+// function shirink_time(time){
+//   function frame() {
+//     if (width < 0) {
+//       clearInterval(id);
+//       nextQuestion();
+//     } else {
+//       width -= 1/time;
+//       timebar.style.width = width + "%";
+//       timer.innerText= `${Math.ceil((width/100)*time)}초`
+//     }
+//   }
+
+//   var timebar = document.getElementById("time-bar");
+//   var timer = document.getElementById("timer");
+//   var width = 100
+//   var id = setInterval(frame, 10);
+//   return id
+// }
 
 function nextQuestion(){
   if (isClicked) return;
   isClicked = true;
   // event.target.dataset.clicked = true;
   var answer = document.querySelector("#answer_input").value;
-  var index = parseInt(document.querySelector("#q-number").innerHTML);
-
+  var index = parseInt(document.querySelector("#q-number").innerText);
   answers.push(answer);
   document.querySelector("#answer_input").value = '';
-  if (index == 5) {
+  
+  if (index == QUESTION_LIST.length) {
     setTimeout(function () {
       get_score();
     }, 1000);
   } else {      
+    document.querySelector('#q_num').innerText = `${index+1}/${QUESTION_LIST.length}`
     setTimeout(function () {
       clearInterval(set_question(index));
     }, 500);
@@ -85,22 +84,19 @@ function nextQuestion(){
   document.querySelector("#question-section").style.opacity = 0;
 }
 
+
 function set_question(index) {
-  let q_content = QUESTION_LIST[index].q_content;
-  // $('#tag').text(q_content);
-  // document.querySelector("#knowledgeTag").innerText = q_content;
+  let question = QUESTION_LIST[index].text;
   document.querySelector("#q-number").innerText = index + 1;
   document.querySelector("#question-section").style.opacity = 1;
-  document.getElementById("time-bar").style.width = 100 + "%";;
-  var left = getRandomIntInclusive(290, 310);
-  var right = getRandomIntInclusive(390, 410);
-  var question = `${left} ${q_content} ${right} = ?`;
-  var time = 60 - QUESTION_LIST[index].grade*5;
+  
   document.querySelector("#question-text").innerText = question;
-  document.querySelector("#spinner").style.display = "none";
-  document.querySelector("#question-section").style.display = "inline-block";
+  unset_loading("#question-section");
   isClicked = false;
-  return shirink_time(time)
+  
+  // document.getElementById("time-bar").style.width = 100 + "%";  
+  // var time = 40 - QUESTION_LIST[index].grade*10;
+  // return shirink_time(time)
 }
 
 function get_score() {
@@ -118,9 +114,8 @@ function get_score() {
     .then((res) => res.json())
     .then((response) => {
       var score = parseInt(JSON.stringify(response));
-      document.querySelector("#spinner").style.display = "none";
+      unset_loading("#result");
       document.querySelector("#question-section").style.display = "none";
-      document.querySelector("#result").style.display = "block";
       if (score != 0) {
         animateValue("value", 0, JSON.stringify(response), 3000);
       }
@@ -128,18 +123,18 @@ function get_score() {
     .catch((error) => console.error("Error:", error));
 }
 
-var isClicked = false;
 document.querySelector('#start_btn').addEventListener("click", function(event){
   document.querySelector("#question-section").dataset.started = true;
   document.querySelector("#start_quiz").style.display = "none";
-  document.querySelector("#spinner").style.display = "inline-block";
-  set_question(0);
-  
+  document.querySelector('#q_num').innerText = `${1}/${QUESTION_LIST.length}`
+  set_loading();
+  set_question(0);  
 })
 
 document.querySelector('#answer-btn').addEventListener("click", function (event) {
   nextQuestion()
 });
+
 document.querySelector('#restart-btn').addEventListener("click", function (event) {
   window.location.reload()
 });

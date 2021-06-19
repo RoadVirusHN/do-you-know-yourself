@@ -28,7 +28,7 @@ def gen_data(data):
 
     
 def inference(data):
-    result = len([i for i in data if i[-1].isnumeric() == True])*20
+    result = len([i for i in data if i[-1]])*25
     print("Before:",data)
     # data = gen_data(data)
     print("After:",data)
