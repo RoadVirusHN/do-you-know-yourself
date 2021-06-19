@@ -11,8 +11,11 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/get_questions', methods=['GET'])
+@app.route('/get_questions', methods=['POST'])
 def get_questions():
+    print(request.json)
+    tag = request.json
+    user = request.json
     questions = [
         {
             'text': "이순신은 어느 시대 사람인가?",

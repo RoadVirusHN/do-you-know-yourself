@@ -5,20 +5,55 @@ var section_ids = [
   "#spinner"
 ]
 var QUESTION_LIST = [];
-fetch("/get_questions")
-.then((res) => res.json())
+var user_id;
+
+
+const spinner = document.querySelector("#spinner");
+const answer_input = document.querySelector("#answer_input");
+const question_section= document.querySelector("#question-section");
+
+const answer_button = document.querySelector('#answer-btn');
+answer_button.addEventListener("click", function (event) {
+  nextQuestion()
+});
+
+document.querySelector('#restart-btn').addEventListener("click", function (event) {
+  window.location.reload()
+});
+
+const user_input = document.querySelector('#user_input');
+user_input.addEventListener("input", function(event){
+  if (user_input.value.length > 2){
+    start_btn.disabled = false;
+  } else {
+    start_btn.disabled = true;
+  }
+});
+
+
+const start_btn = document.querySelector('#start_btn');
+start_btn.addEventListener("click", function(event){
+  question_section.dataset.started = true;
+  document.querySelector("#start_quiz").style.display = "none";
+  set_loading();
+  fetch("/get_questions", {
+    method: "POST",
+    body:  JSON.stringify({tag:'0', user:user_input.value}), 
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+  .then((res) => res.json())
   .then((response) => {
-    // console.log(typeof(response))
     for (const k in response){
       QUESTION_LIST.push(response[k]);
     }
-    // QUESTION_LIST = response.map(x=>response[x]);
-    // console.log(QUESTION_LIST)
-    unset_loading("#start_quiz");
+    document.querySelector('#q_num').innerText = `${1}/${QUESTION_LIST.length}`
+    set_question(0);  
   })
-  .catch((error) => console.error("Error:", error));
+  .catch((error) => console.error("Error:", error));  
+});
 
-set_loading();
 var isClicked = false;
 var answers = [];
 
@@ -32,12 +67,11 @@ function set_loading() {
   for (let section of section_ids){
     document.querySelector(section).style.display = "none";
   }
-  document.querySelector("#spinner").style.display = "inline-block";
-  console.log(document.querySelector("#spinner").style.display)
+  spinner.style.display = "inline-block"
 }
 
 function unset_loading(ids){  
-  document.querySelector("#spinner").style.display = "none";
+  spinner.style.display = "none";
   document.querySelector(ids).style.display = "inline-block";
 }
 
@@ -64,10 +98,10 @@ function nextQuestion(){
   if (isClicked) return;
   isClicked = true;
   // event.target.dataset.clicked = true;
-  var answer = document.querySelector("#answer_input").value;
+  var answer = answer_input.value;
   var index = parseInt(document.querySelector("#q-number").innerText);
   answers.push(answer);
-  document.querySelector("#answer_input").value = '';
+  answer_input.value = '';
   
   if (index == QUESTION_LIST.length) {
     setTimeout(function () {
@@ -80,15 +114,14 @@ function nextQuestion(){
     }, 500);
   }
 
-  document.querySelector("#spinner").style.display = "inline-block";
-  document.querySelector("#question-section").style.opacity = 0;
+  spinner.style.display = "inline-block";
+  question_section.style.opacity = 0;
 }
-
 
 function set_question(index) {
   let question = QUESTION_LIST[index].text;
   document.querySelector("#q-number").innerText = index + 1;
-  document.querySelector("#question-section").style.opacity = 1;
+  question_section.style.opacity = 1;
   
   document.querySelector("#question-text").innerText = question;
   unset_loading("#question-section");
@@ -115,29 +148,13 @@ function get_score() {
     .then((response) => {
       var score = parseInt(JSON.stringify(response));
       unset_loading("#result");
-      document.querySelector("#question-section").style.display = "none";
+      question_section.style.display = "none";
       if (score != 0) {
         animateValue("value", 0, JSON.stringify(response), 3000);
       }
     })
     .catch((error) => console.error("Error:", error));
 }
-
-document.querySelector('#start_btn').addEventListener("click", function(event){
-  document.querySelector("#question-section").dataset.started = true;
-  document.querySelector("#start_quiz").style.display = "none";
-  document.querySelector('#q_num').innerText = `${1}/${QUESTION_LIST.length}`
-  set_loading();
-  set_question(0);  
-})
-
-document.querySelector('#answer-btn').addEventListener("click", function (event) {
-  nextQuestion()
-});
-
-document.querySelector('#restart-btn').addEventListener("click", function (event) {
-  window.location.reload()
-});
 
 function animateValue(id, start, end, duration) {
   if (start === end) return;
