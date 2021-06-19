@@ -1,58 +1,68 @@
-var section_ids = [
-  "#result",
-  "#question-section",
-  "#start_quiz",
-  "#spinner"
-]
+var section_ids = ["#result", "#question-section", "#start_quiz", "#spinner"];
 var QUESTION_LIST = [];
-var user_id;
-
+var user_id, tag;
 
 const spinner = document.querySelector("#spinner");
 const answer_input = document.querySelector("#answer_input");
-const question_section= document.querySelector("#question-section");
+const question_section = document.querySelector("#question-section");
 
-const answer_button = document.querySelector('#answer-btn');
+const answer_button = document.querySelector("#answer-btn");
 answer_button.addEventListener("click", function (event) {
-  nextQuestion()
+  nextQuestion();
 });
 
-document.querySelector('#restart-btn').addEventListener("click", function (event) {
-  window.location.reload()
-});
+document
+  .querySelector("#restart-btn")
+  .addEventListener("click", function (event) {
+    window.location.reload();
+  });
 
-const user_input = document.querySelector('#user_input');
-user_input.addEventListener("input", function(event){
-  if (user_input.value.length > 2){
+const user_input = document.querySelector("#user_input");
+user_input.addEventListener("input", function (event) {
+  user_id = user_input.value;
+  if (user_input.value.length > 2 && tag_input.value) {
     start_btn.disabled = false;
   } else {
     start_btn.disabled = true;
   }
 });
 
-
-const start_btn = document.querySelector('#start_btn');
-start_btn.addEventListener("click", function(event){
+const tag_input = document.querySelector("#tag_input");
+tag_input.addEventListener("change", function (event) {
+  tag = tag_input.value;
+  if (user_input.value.length > 2 && tag_input.value) {
+    start_btn.disabled = false;
+  } else {
+    start_btn.disabled = true;
+  }
+});
+const indicator = document.querySelector("#indicator");
+const start_btn = document.querySelector("#start_btn");
+start_btn.addEventListener("click", function (event) {
   question_section.dataset.started = true;
   document.querySelector("#start_quiz").style.display = "none";
+  user_id = user_input.value;
+  tag = tag_input.value;
   set_loading();
   fetch("/get_questions", {
     method: "POST",
-    body:  JSON.stringify({tag:'0', user:user_input.value}), 
+    body: JSON.stringify({ tag: tag, user: user_id }),
     headers: {
       "Content-Type": "application/json",
     },
   })
-  .then((res) => res.json())
-  .then((response) => {
-    console.log(response)
-    for (const k in response){
-      QUESTION_LIST.push(response[k]);
-    }
-    document.querySelector('#q_num').innerText = `${1}/${QUESTION_LIST.length}`
-    set_question(0);  
-  })
-  .catch((error) => console.error("Error:", error));  
+    .then((res) => res.json())
+    .then((response) => {
+      for (const k in response) {
+        QUESTION_LIST.push(response[k]);
+      }
+      document.querySelector("#q_num").innerText = `${1}/${
+        QUESTION_LIST.length
+      }`;
+      set_question(0);
+      indicator.innerText = "⚪".repeat(QUESTION_LIST.length);
+    })
+    .catch((error) => console.error("Error:", error));
 });
 
 var isClicked = false;
@@ -68,10 +78,10 @@ function set_loading() {
   for (let section of section_ids) {
     document.querySelector(section).style.display = "none";
   }
-  spinner.style.display = "inline-block"
+  spinner.style.display = "inline-block";
 }
 
-function unset_loading(ids){  
+function unset_loading(ids) {
   spinner.style.display = "none";
   document.querySelector(ids).style.display = "inline-block";
 }
@@ -95,21 +105,45 @@ function unset_loading(ids){
 //   return id
 // }
 
+function is_answer_right(answer, ground_truth) {
+  return (
+    normalize(answer) != "" &&
+    (normalize(answer).includes(normalize(ground_truth)) ||
+      normalize(ground_truth).includes(normalize(answer)))
+  );
+};
+
+function normalize(original) {
+  return original.replace(/[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣1-9]/g, "");
+};
+
 function nextQuestion() {
   if (isClicked) return;
   isClicked = true;
   // event.target.dataset.clicked = true;
   var answer = answer_input.value;
   var index = parseInt(document.querySelector("#q-number").innerText);
+  var real_index = index - 1;
   answers.push(answer);
-  answer_input.value = '';
-  
+  answer_input.value = "";
+  if (is_answer_right(answer, QUESTION_LIST[real_index]["answer"])) {
+    QUESTION_LIST[real_index]["user_answer"] = 1;
+    indicator.innerText = indicator.innerText.replace("⚪", "🟢");
+  } else {
+    QUESTION_LIST[real_index]["user_answer"] = 0;
+    indicator.innerText = indicator.innerText.replace("⚪", "🔴");
+  }
+  QUESTION_LIST[real_index]["user_id"] = user_id;
+  QUESTION_LIST[real_index]["tag"] = tag;
+
   if (index == QUESTION_LIST.length) {
     setTimeout(function () {
       get_score();
     }, 1000);
   } else {
-    document.querySelector('#q_num').innerText = `${index + 1}/${QUESTION_LIST.length}`
+    document.querySelector("#q_num").innerText = `${index + 1}/${
+      QUESTION_LIST.length
+    }`;
     setTimeout(function () {
       clearInterval(set_question(index));
     }, 500);
@@ -123,20 +157,22 @@ function set_question(index) {
   let question = QUESTION_LIST[index].text;
   document.querySelector("#q-number").innerText = index + 1;
   question_section.style.opacity = 1;
-  
+
   document.querySelector("#question-text").innerText = question;
   unset_loading("#question-section");
+  answer_input.autofocus = true;
   isClicked = false;
 
-  // document.getElementById("time-bar").style.width = 100 + "%";  
+  // document.getElementById("time-bar").style.width = 100 + "%";
   // var time = 40 - QUESTION_LIST[index].grade*10;
   // return shirink_time(time)
 }
 
 function get_score() {
-  for (var i = 0; i < QUESTION_LIST.length; i++) {
-    QUESTION_LIST[i]["answer"] = answers[i];
-  }
+  // for (var i = 0; i < QUESTION_LIST.length; i++) {
+  //   QUESTION_LIST[i]["user_id"] = user_id;
+  //   QUESTION_LIST[i]["tag"] = tag;
+  // }
 
   fetch("/get_score", {
     method: "POST", // or 'PUT'

@@ -1,4 +1,7 @@
 {% extends "base.html" %} {% block body %}
+<div id="indicator" style="text-align: center; margin-top: 2%;">
+    🟢🔴⚪
+</div>
 <div
   class="row align-items-center justify-content-center"
   style="
@@ -12,6 +15,10 @@
     transform: translate(-50%, -50%);
   "
 >
+
+  <div class="spinner-grow" id="spinner" role="status" style="display: none">
+    <span class="sr-only"></span>
+  </div>
   <div id="start_quiz" class="col justify-content-center mb-5">
     <h1 class="mb-5">DKDKT 상식 테스트</h1>
     <p class="mx-5" style="font-size: 1.5rem">
@@ -24,6 +31,14 @@
       type="text"
       placeholder="이름(세글자 이상)"
     />
+    <select id="tag_input" class="form-select form-select-lg mx-auto" style="width: 20%;">
+      <option selected value="" >분야 선택</option>
+      <option value="0">인물</option>
+      <option value="1">역사</option>
+      <option value="2">사회</option>
+      <option value="3">스포츠</option>
+      <option value="4">컴퓨터공학</option>
+    </select>
     <br/>
     <button
       type="button"
@@ -36,9 +51,6 @@
     </button>
   </div>
 
-  <div class="spinner-grow" id="spinner" role="status" style="display: none">
-    <span class="sr-only"></span>
-  </div>
 
   <div
     id="question-section"
@@ -54,7 +66,7 @@
             id="answer_input"
             class="form-control-lg my-2"
             type="text"
-            placeholder="답안"
+            placeholder="답안"            
             aria-label="example"
           />
           <br />
