@@ -169,7 +169,6 @@ function set_question(index) {
   start = new Date();
 }
 function embed_card(card_name, data) {
-  console.log(data);
   card = document.querySelector(card_name);
   const card_title = card.querySelector(".card-title");
   const user_name = card.querySelector("#user_name");
@@ -177,7 +176,7 @@ function embed_card(card_name, data) {
   const hidden_answer_btn = card.querySelector(".hidden_answer_btn");
   card_title.innerText = data["text"];
   user_name.innerText = user_id;
-  hidden_answer.innerText = data["answer"];
+  hidden_answer.innerText = parseInt(data["answer"])+1;
 
   hidden_answer_btn.addEventListener("click", function (event) {
     hidden_answer.hidden = false;

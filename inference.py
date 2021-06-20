@@ -29,9 +29,7 @@ def gen_data(data):
     
 def inference(data):
     result = len([i for i in data if i[-1]])
-    print("Before:",data)
     # data = gen_data(data)
-    print("After:",data)
     
     #TODO
     #이곳에서 위에서 생성한 데이터를 기반으로 inference한 값들을 평균을 내서 입력해주시면 되겠습니다.

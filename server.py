@@ -30,7 +30,7 @@ def insert_data(data):
     cur.execute(qry)
     rows = cur.fetchall()
     for row in data:
-        qry_values = "NULL,'{}','{}','{}', '{}', '{}', '{}','{}'".format(
+        qry_values = "Null, '{}','{}','{}', '{}', '{}', '{}', '{}'".format(
             row[0],
             row[1],
             row[2],
@@ -53,7 +53,6 @@ def index():
 @app.route("/get_questions", methods=["POST"])
 def get_questions():
     tag = request.json["tag"]
-    user = request.json["user"]
     questions = pd.read_csv("questions_dataset.csv")
     questions = questions.groupby("KnowledgeTag").get_group(int(tag))
     questions = questions.sample(10)
