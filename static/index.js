@@ -66,7 +66,6 @@ start_btn.addEventListener("click", function (event) {
       set_question(0);
       indicator.innerText = "⚪".repeat(QUESTION_LIST.length);
       document.addEventListener("keydown", function (event) {
-        console.log(event);
         if (
           event.key == "1" ||
           event.key == "2" ||
@@ -159,7 +158,6 @@ function set_question(index) {
   document.querySelector("#q-number").innerText = index + 1;
   question_section.style.opacity = 1;
   for (var i of [0, 1, 2, 3]) {
-    console.log(QUESTION_LIST[index][`choice${i}`]);
     document.querySelector(`#choice${i}`).innerText =
       QUESTION_LIST[index][`choice${i}`];
   }
