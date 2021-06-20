@@ -60,9 +60,9 @@ start_btn.addEventListener("click", function (event) {
       for (const k in response) {
         QUESTION_LIST.push(response[k]);
       }
-      document.querySelector("#q_num").innerText = `${1}/${
-        QUESTION_LIST.length
-      }`;
+      document.querySelector("#q_num").innerText = `${1}/${QUESTION_LIST.length
+        }`;
+      console.log(QUESTION_LIST)
       set_question(0);
       indicator.innerText = "⚪".repeat(QUESTION_LIST.length);
       document.addEventListener("keydown", function (event) {
@@ -142,9 +142,8 @@ function nextQuestion() {
       get_score();
     }, 1000);
   } else {
-    document.querySelector("#q_num").innerText = `${index + 1}/${
-      QUESTION_LIST.length
-    }`;
+    document.querySelector("#q_num").innerText = `${index + 1}/${QUESTION_LIST.length
+      }`;
     setTimeout(function () {
       clearInterval(set_question(index));
     }, 500);
@@ -204,9 +203,8 @@ function get_score() {
       unset_loading("#result");
       question_section.style.display = "none";
       console.log(tag_input);
-      document.querySelector("#all_len").innerText = `${
-        tag_input.options[parseInt(tag) + 1].innerText
-      } 분야 ${data["tag_problem_len"]} 문제 중에 `;
+      document.querySelector("#all_len").innerText = `${tag_input.options[parseInt(tag) + 1].innerText
+        } 분야 ${data["tag_problem_len"]} 문제 중에 `;
       if (data["score"] != 0) {
         animateValue("value", 0, data["score"], 3000);
       }
