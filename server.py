@@ -8,7 +8,6 @@ app = Flask(__name__)
 
 
 def insert_data(data):
-
     with open("data.csv", mode="a") as file_:
         for d in data:
             file_.write(
@@ -57,7 +56,7 @@ def get_questions():
     tag = request.json["tag"]
     questions = pd.read_csv("questions_dataset.csv")
     questions = questions.groupby("KnowledgeTag").get_group(int(tag))
-    questions = questions.sample(10)
+    questions = questions.sample(5)
     return Response(questions.to_json(orient="records"), mimetype="application/json")
 
 
