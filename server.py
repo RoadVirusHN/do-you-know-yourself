@@ -24,12 +24,12 @@ def get_questions():
 @app.route("/get_score", methods=["POST"])
 def get_score():
     data = request.json
+    # dictionary to csv
     user_data = []
     for d in data:
         if "answer" in d:
             row = [d["tag"], d["assess"], d["grade"], d["text"], d["answer"], d["elapsed"], d["user_id"]]
             user_data.append(row)
-
     data = inference.inference(user_data)
     return data
 
