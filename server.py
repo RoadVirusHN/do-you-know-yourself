@@ -12,11 +12,12 @@ def insert_data(data):
     with open("data.csv", mode="a") as file_:
         for d in data:
             file_.write(
-                "{}','{}','{}', '{}', '{}', '{}'".format(
+                "'{}','{}','{}', '{}', '{}', '{}','{}'".format(
                     d[0],
                     d[1],
                     d[2],
                     d[3],
+                    d[4],
                     d[5],
                     d[6],
                 )
@@ -29,11 +30,12 @@ def insert_data(data):
     cur.execute(qry)
     rows = cur.fetchall()
     for row in data:
-        qry_values = "NULL,'{}','{}','{}', '{}', '{}', '{}'".format(
+        qry_values = "NULL,'{}','{}','{}', '{}', '{}', '{}','{}'".format(
             row[0],
             row[1],
             row[2],
             row[3],
+            row[4],
             row[5],
             row[6],
         )
@@ -52,8 +54,9 @@ def index():
 def get_questions():
     tag = request.json["tag"]
     user = request.json["user"]
-    questions = pd.read_csv("question.csv")
-    questions = questions.groupby("tag").get_group(int(tag))
+    questions = pd.read_csv("questions_dataset.csv")
+    questions = questions.groupby("KnowledgeTag").get_group(int(tag))
+    questions = questions.sample(10)
     return Response(questions.to_json(orient="records"), mimetype="application/json")
 
 
@@ -66,10 +69,10 @@ def get_score():
         if "answer" in d:
             row = [
                 d["user_id"],
-                d["tag"],
-                d["assess"],
+                d["KnowledgeTag"],
+                d["assessmentItemID"],
+                d["testId"],
                 d["grade"],
-                d["text"],
                 d["user_answer"],
                 d["elapsed"],
             ]
