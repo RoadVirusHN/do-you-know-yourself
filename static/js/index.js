@@ -104,18 +104,6 @@ function unset_loading(ids) {
   document.querySelector(ids).style.display = "inline-block";
 }
 
-function is_answer_right(answer, ground_truth) {
-  return (
-    normalize(answer) != "" &&
-    (normalize(answer).includes(normalize(ground_truth)) ||
-      normalize(ground_truth).includes(normalize(answer)))
-  );
-}
-
-function normalize(original) {
-  return original.replace(/[^a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣1-9]/g, "");
-}
-
 function nextQuestion() {
   if (isClicked) return;
   isClicked = true;
@@ -200,7 +188,9 @@ function get_score() {
       var data = response;
       unset_loading("#result");
       question_section.style.display = "none";
-      console.log(tag_input);
+      document.querySelector('#real_result').innerText = `${QUESTION_LIST.filter(function(item){
+        return item['user_answer'];
+      }).length}/${QUESTION_LIST.length}`
       document.querySelector("#all_len").innerText = `${tag_input.options[parseInt(tag) + 1].innerText
         } 분야 ${data["tag_problem_len"]} 문제 중에 `;
       if (data["score"] != 0) {
