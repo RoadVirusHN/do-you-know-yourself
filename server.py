@@ -1,14 +1,13 @@
 from flask import Flask, render_template, request, jsonify, Response
 import pandas as pd
 import sqlite3
-import inference
+from model import inference
 import csv
 
 app = Flask(__name__)
 
-
 def insert_data(data):
-    with open("data.csv", mode="a") as file_:
+    with open("data/data.csv", mode="a") as file_:
         for d in data:
             file_.write(
                 "'{}','{}','{}', '{}', '{}', '{}','{}','{}'".format(
@@ -54,7 +53,7 @@ def index():
 @app.route("/get_questions", methods=["POST"])
 def get_questions():
     tag = request.json["tag"]
-    questions = pd.read_csv("questions_dataset.csv")
+    questions = pd.read_csv("./data/questions_dataset.csv")
     questions = questions.groupby("KnowledgeTag").get_group(int(tag))
     questions = questions.sample(5)
     return Response(questions.to_json(orient="records"), mimetype="application/json")
@@ -79,7 +78,9 @@ def get_score():
             ]
             user_data.append(row)
     insert_data(user_data)
-    data = inference.inference(user_data)
+    data = pd.DataFrame.from_dict(data)
+    data = inference.inference(data, "wholetrain")
+    print(data)
     return data
 
 
