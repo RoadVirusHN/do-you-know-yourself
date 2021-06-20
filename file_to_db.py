@@ -12,7 +12,7 @@ def migrate(path=""):
         ## TABLE for user interaction
         cur.execute(
             """CREATE TABLE problems
-                    (row_index INTEGER PRIMARY KEY, userID TEXT,KnowledgeTag INTEGER,assessmentItemID TEXT,testId TEXT,grade INTEGER,answerCode INTEGER,elapsed INTEGER)"""
+                    (row_index INTEGER PRIMARY KEY, userID TEXT,KnowledgeTag INTEGER,assessmentItemID TEXT,testId TEXT,grade INTEGER,answerCode INTEGER,elapsed INTEGER,Timestamp INTEGER)"""
         )
         ## TABLE for data log
         ## 마지막으로 추출한 데이터가 어디인지 확인하기 위해

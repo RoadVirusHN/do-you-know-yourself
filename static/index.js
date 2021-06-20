@@ -134,6 +134,7 @@ function nextQuestion() {
   }
   QUESTION_LIST[real_index]["user_id"] = user_id;
   QUESTION_LIST[real_index]["tag"] = tag;
+  QUESTION_LIST[real_index]['Timestamp'] = (new Date()).getTime();
   QUESTION_LIST[real_index]["elapsed"] = end - start;
 
   if (index == QUESTION_LIST.length) {

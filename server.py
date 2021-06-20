@@ -12,7 +12,7 @@ def insert_data(data):
     with open("data.csv", mode="a") as file_:
         for d in data:
             file_.write(
-                "'{}','{}','{}', '{}', '{}', '{}','{}'".format(
+                "'{}','{}','{}', '{}', '{}', '{}','{}','{}'".format(
                     d[0],
                     d[1],
                     d[2],
@@ -20,6 +20,7 @@ def insert_data(data):
                     d[4],
                     d[5],
                     d[6],
+                    d[7],
                 )
             )
             file_.write("\n")
@@ -30,7 +31,7 @@ def insert_data(data):
     cur.execute(qry)
     rows = cur.fetchall()
     for row in data:
-        qry_values = "Null, '{}','{}','{}', '{}', '{}', '{}', '{}'".format(
+        qry_values = "NULL,'{}','{}','{}', '{}', '{}', '{}','{}','{}'".format(
             row[0],
             row[1],
             row[2],
@@ -38,6 +39,7 @@ def insert_data(data):
             row[4],
             row[5],
             row[6],
+            row[7],
         )
         query = """INSERT INTO problems VALUES ({})""".format(qry_values)
         cur.execute(query)
@@ -74,6 +76,7 @@ def get_score():
                 d["grade"],
                 d["user_answer"],
                 d["elapsed"],
+                d["Timestamp"],
             ]
             user_data.append(row)
     insert_data(user_data)
