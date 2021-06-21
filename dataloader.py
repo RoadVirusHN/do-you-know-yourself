@@ -202,7 +202,6 @@ def feature_engineering(df):
 
 
 def preprocess_dataset (df) :
-    print(df)
     df.userID = df.userID.apply(lambda x : x.replace("'", ''))
     df['KnowledgeTag']=df['KnowledgeTag'].astype(str)
     df['KnowledgeTag']=df['KnowledgeTag'].apply(lambda x:x.replace("'",""))
@@ -354,11 +353,12 @@ def ELO_function (df) :
     
     return df
 
-def recent_data_processing():
+def recent_data_processing(last_data=False):
     df = pd.read_csv('./data/data.csv')
-    # df = df.tail(100)
+    print(len(df))
     df = preprocess_dataset(df)
     df = feature_engineering(df)
+    print(len(df))
 
     ordinal_feats = ['grade']
     label_feats = ['problem_number','solved_disorder','KnowledgeTag','testId','retest']
@@ -377,6 +377,7 @@ def recent_data_processing():
         X = enc.transform(X)
         df[c] = X
 
+    if last_data: df = df.tail(100)
     y_train = df['user_answer']
     train = df.drop(['user_answer'], axis = 1)
 

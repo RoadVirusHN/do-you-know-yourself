@@ -10,7 +10,7 @@ import lightgbm as lgb
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import accuracy_score
 import torch
-from dataloader import feature_engineering
+from dataloader import recent_data_processing
 import pickle
 
 # import mlflow
@@ -104,9 +104,10 @@ def finetune(model):
         'GradeMElp', 'problem_count', 'tag_count',
         'problem_position', 'solve_order', 'solved_disorder'
     ]
-
-    train_data = pd.read_csv('./data/y_train.csv')
-    ground_truth = pd.read_csv('./data/train.csv')
+    recent_data_processing(last_data=True)
+    train_data = pd.read_csv('./data/new_train.csv')
+    ground_truth = pd.read_csv('./data/new_y_train.csv')
+    print(len(ground_truth))
 
     lgb_train = lgb.Dataset(train_data[features], ground_truth, free_raw_data=False)
     eval_result = {}
@@ -114,6 +115,7 @@ def finetune(model):
     # mlflow.log_metric('AUC', eval_result['train']['auc'][-1])
    
     now = datetime.today().strftime('\%Y-\%m-\%d')
-    model.save_model(f'./model/lgbm/lgbm_{now}.txt')
+    model.save_model(f'./model/lgbm/lgbm_{now}_finetunned.txt')
     # mlflow.lightgbm.log_model(model, 'save_model')
     # mlflow.end_run()
+    return model

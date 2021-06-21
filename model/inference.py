@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import lightgbm as lgb
 from model import train
+from dataloader import recent_data_processing
 
 
 features = [
@@ -22,7 +23,7 @@ features = [
 ]
 
 
-def inference(data, mode):
+def inference(data, mode="nope"):
     problem_df = pd.read_csv("./data/questions_dataset.csv")
     solved_df = pd.read_csv("./data/train.csv")
     tag_num = data['KnowledgeTag'][0]
@@ -34,26 +35,37 @@ def inference(data, mode):
     # 해당 태그 문제들 중 0.5를 넘는 것은 정답, 못넘으면 틀린 것으로 result 내기
     # model = lgb.Booster(model_file='model.txt')
     # 노 train 모드에서는 그냥 model로 예측치 가져오기
-    # if mode=="finetune":
-    # # 가져온 모델을 finetune
-    #     model = train.finetune(model)
-    # elif mode=="wholetrain":
+
+    if mode=="w":
+        recent_data_processing()
+
     # 새로 모델을 생성
     model = train.train()
+
+    if mode=="f":
+    # 가져온 모델을 finetune
+        model = train.finetune(model)
+        
+    solved_problem = solved_problem.fillna(0)
     # tag에 해당하는 풀이들의 풀 확률 계산
     solved_problem['result'] = model.predict(solved_problem[features])
     # 각 문제들의 유저별, 시간대별 평균 풀 확률 계산 
     problem_acc = solved_problem.groupby("assessmentItemID")['result'].agg('mean').reset_index()
     problem_acc.columns = ['assessmentItemID', 'prob']
     # 각 문제들의 풀이 확률에 대입
+    
+    print(tag_problem.isna().any().sum())
+    print(tag_problem['assessmentItemID'].unique(),problem_acc['assessmentItemID'].unique())
     tag_problem = pd.merge(tag_problem, problem_acc, on=['assessmentItemID'], how="left")
-
+    print(tag_problem.isna().any().sum())
     # 만약, 이미 유저가 틀렸거나 맞았다면, 제외
     new_tag_problem = tag_problem[~tag_problem['assessmentItemID'].isin(data['assessmentItemID'].unique())]
     hard_problem = new_tag_problem.loc[new_tag_problem[['prob']].idxmin()].to_dict()
     easy_problem = new_tag_problem.loc[new_tag_problem[['prob']].idxmax()].to_dict()
     hard_problem = { k:list(v.items())[0][1] for k, v in hard_problem.items()}
     easy_problem = { k:list(v.items())[0][1] for k, v in easy_problem.items()}
+    print(new_tag_problem['prob'])
+    print(hard_problem, easy_problem)
     # user가 풀었거나, 정답확률이 0.5 이상이면 score로 추가
     result = len(data[data['user_answer']==1])
     result += len(new_tag_problem[new_tag_problem['prob'] >= 0.5])

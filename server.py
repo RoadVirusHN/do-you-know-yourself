@@ -79,8 +79,7 @@ def get_score():
             user_data.append(row)
     insert_data(user_data)
     data = pd.DataFrame.from_dict(data)
-    data = inference.inference(data, "wholetrain")
-    print(data)
+    data = inference.inference(data, "f")
     return data
 
 
