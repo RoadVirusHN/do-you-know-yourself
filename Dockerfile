@@ -10,11 +10,13 @@ WORKDIR /app
 # Copy the dependencies file to the working directory
 COPY requirements.txt .
 
+# update pip
+Run pip install --upgrade pip
 # Install any dependencies
 RUN pip install -r requirements.txt
 
 # Copy the content of the local src directory to the working directory
-COPY app.py .
+COPY server.py .
 
 # Specify the command to run on container start
-CMD [ "python", "./app.py" ]
+CMD [ "python", "./server.py" ]
