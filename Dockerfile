@@ -1,9 +1,5 @@
 # Set base image (host OS)
-FROM python:3.8-alpine
-
-#resolving numpy error
-RUN apk update
-RUN apk add make automake gcc g++ subversion python3-dev
+FROM python:3.7.4
 
 # By default, listen on port 5000
 EXPOSE 5000/tcp
