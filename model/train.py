@@ -107,7 +107,6 @@ def finetune(model):
     recent_data_processing(last_data=True)
     train_data = pd.read_csv('./data/new_train.csv')
     ground_truth = pd.read_csv('./data/new_y_train.csv')
-    print(len(ground_truth))
 
     lgb_train = lgb.Dataset(train_data[features], ground_truth, free_raw_data=False)
     eval_result = {}

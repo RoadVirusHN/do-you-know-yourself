@@ -30,6 +30,7 @@ def inference(data, mode="nope"):
     tag_problem = problem_df[problem_df['KnowledgeTag'] == tag_num] # tag에 해당하는 문제들
     # tag에 해당하는 풀이들
     solved_problem = solved_df[solved_df['KnowledgeTag'] == tag_num]
+    sf = (tag_problem['assessmentItemID'].unique(),solved_problem['assessmentItemID'].unique())
     
     # 해당하는 태그의 문제를 모두 가져오고, predict한 뒤, 가장 어려운 문제, 가장 쉬운 문제를 가져오기,
     # 해당 태그 문제들 중 0.5를 넘는 것은 정답, 못넘으면 틀린 것으로 result 내기
@@ -56,6 +57,7 @@ def inference(data, mode="nope"):
     
     print(tag_problem.isna().any().sum())
     print(tag_problem['assessmentItemID'].unique(),problem_acc['assessmentItemID'].unique())
+    print(sf)
     tag_problem = pd.merge(tag_problem, problem_acc, on=['assessmentItemID'], how="left")
     print(tag_problem.isna().any().sum())
     # 만약, 이미 유저가 틀렸거나 맞았다면, 제외
@@ -69,5 +71,5 @@ def inference(data, mode="nope"):
     # user가 풀었거나, 정답확률이 0.5 이상이면 score로 추가
     result = len(data[data['user_answer']==1])
     result += len(new_tag_problem[new_tag_problem['prob'] >= 0.5])
-    result += int((new_tag_problem.isna().any(axis=1).sum())//2)
+    result += int((new_tag_problem.isna().any(axis=1).sum())//2) # 아무도 푼적이 없는 데이터 처리
     return {"tag_problem_len": len(tag_problem), "score": result, "h_problem": hard_problem, "e_problem": easy_problem}

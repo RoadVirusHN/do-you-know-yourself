@@ -355,10 +355,8 @@ def ELO_function (df) :
 
 def recent_data_processing(last_data=False):
     df = pd.read_csv('./data/data.csv')
-    print(len(df))
     df = preprocess_dataset(df)
     df = feature_engineering(df)
-    print(len(df))
 
     ordinal_feats = ['grade']
     label_feats = ['problem_number','solved_disorder','KnowledgeTag','testId','retest']
@@ -380,6 +378,9 @@ def recent_data_processing(last_data=False):
     if last_data: df = df.tail(100)
     y_train = df['user_answer']
     train = df.drop(['user_answer'], axis = 1)
-
-    y_train.to_csv('./data/y_train.csv',index=False)
-    train.to_csv('./data/train.csv',index=False)
+    if last_data:        
+        y_train.to_csv('./data/new_y_train.csv',index=False)
+        train.to_csv('./data/new_train.csv',index=False)
+    else:
+        y_train.to_csv('./data/y_train.csv',index=False)
+        train.to_csv('./data/train.csv',index=False)
