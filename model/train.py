@@ -9,9 +9,7 @@ from datetime import datetime
 import lightgbm as lgb
 from sklearn.metrics import roc_auc_score
 from sklearn.metrics import accuracy_score
-import torch
 from dataloader import recent_data_processing
-import pickle
 
 # import mlflow
 

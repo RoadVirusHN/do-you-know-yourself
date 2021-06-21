@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, jsonify, Response
 import pandas as pd
 import sqlite3
 from model import inference
-import csv
 
 app = Flask(__name__)
 
