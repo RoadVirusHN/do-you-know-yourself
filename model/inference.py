@@ -1,8 +1,5 @@
-import os
 import pandas as pd
-import numpy as np
-import lightgbm as lgb
-import train
+from model import train
 from dataloader import recent_data_processing
 
 
@@ -30,8 +27,7 @@ def inference(data, mode="nope"):
     tag_problem = problem_df[problem_df['KnowledgeTag'] == tag_num] # tag에 해당하는 문제들
     # tag에 해당하는 풀이들
     solved_problem = solved_df[solved_df['KnowledgeTag'] == tag_num]
-    sf = (tag_problem['assessmentItemID'].unique(),solved_problem['assessmentItemID'].unique())
-    
+
     # 해당하는 태그의 문제를 모두 가져오고, predict한 뒤, 가장 어려운 문제, 가장 쉬운 문제를 가져오기,
     # 해당 태그 문제들 중 0.5를 넘는 것은 정답, 못넘으면 틀린 것으로 result 내기
     # model = lgb.Booster(model_file='model.txt')
@@ -55,19 +51,15 @@ def inference(data, mode="nope"):
     problem_acc.columns = ['assessmentItemID', 'prob']
     # 각 문제들의 풀이 확률에 대입
     
-    print(tag_problem.isna().any().sum())
-    print(tag_problem['assessmentItemID'].unique(),problem_acc['assessmentItemID'].unique())
-    print(sf)
+
     tag_problem = pd.merge(tag_problem, problem_acc, on=['assessmentItemID'], how="left")
-    print(tag_problem.isna().any().sum())
+
     # 만약, 이미 유저가 틀렸거나 맞았다면, 제외
     new_tag_problem = tag_problem[~tag_problem['assessmentItemID'].isin(data['assessmentItemID'].unique())]
     hard_problem = new_tag_problem.loc[new_tag_problem[['prob']].idxmin()].to_dict()
     easy_problem = new_tag_problem.loc[new_tag_problem[['prob']].idxmax()].to_dict()
     hard_problem = { k:list(v.items())[0][1] for k, v in hard_problem.items()}
     easy_problem = { k:list(v.items())[0][1] for k, v in easy_problem.items()}
-    print(new_tag_problem['prob'])
-    print(hard_problem, easy_problem)
     # user가 풀었거나, 정답확률이 0.5 이상이면 score로 추가
     result = len(data[data['user_answer']==1])
     result += len(new_tag_problem[new_tag_problem['prob'] >= 0.5])

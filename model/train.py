@@ -1,14 +1,7 @@
 import pandas as pd
-import os
-import random
-import math
-from tqdm import tqdm
-import numpy as np
 from datetime import datetime
 
 import lightgbm as lgb
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import accuracy_score
 from dataloader import recent_data_processing
 
 # import mlflow

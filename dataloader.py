@@ -1,16 +1,8 @@
 import pandas as pd
-import os
-import random
 import math
 from tqdm import tqdm
 import numpy as np
-import time
 from datetime import datetime
-
-import lightgbm as lgb
-from sklearn.metrics import roc_auc_score
-from sklearn.metrics import accuracy_score
-import torch
 from sklearn.preprocessing import OrdinalEncoder, LabelEncoder
 
 # data의 종류
